@@ -7,20 +7,24 @@ import {
   FormControl,
   InputLabel,
   Box,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
 import axios from "axios";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL;
 
 const PromptForm = ({ onSubmit }) => {
   const [originalPrompt, setOriginalPrompt] = useState("");
   const [technique, setTechnique] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     try {
       const response = await axios.post(`${API_URL}/prompts`, {
         originalPrompt,
@@ -31,7 +35,10 @@ const PromptForm = ({ onSubmit }) => {
       setTechnique("");
     } catch (error) {
       console.error("Error refining prompt:", error);
-      // You might want to show an error message to the user here
+      setError(
+        error.response?.data?.message ||
+          "An error occurred while refining the prompt"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -71,6 +78,19 @@ const PromptForm = ({ onSubmit }) => {
           </Button>
         </motion.div>
       </Box>
+      <Snackbar
+        open={!!error}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert
+          onClose={() => setError(null)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
+          {error}
+        </Alert>
+      </Snackbar>
     </form>
   );
 };

@@ -1,69 +1,61 @@
-import React, { useState, useEffect } from "react";
-import { Container, Typography } from "@mui/material";
+import React, { useState } from "react";
+import { TextField, Button, Typography, Box } from "@mui/material";
 import axios from "axios";
-import Header from "./components/Header";
-import PromptForm from "./components/PromptForm";
-import PromptList from "./components/PromptList";
-import Auth from "./components/Auth";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+const API_URL = process.env.REACT_APP_API_URL;
 
-const App = () => {
-  const [prompts, setPrompts] = useState([]);
-  const [token, setToken] = useState(localStorage.getItem("token"));
+const Auth = ({ setToken }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-      fetchPrompts();
-    }
-  }, [token]);
-
-  const fetchPrompts = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.get(`${API_URL}/prompts`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const endpoint = isLogin ? "/auth/login" : "/auth/register";
+      const response = await axios.post(`${API_URL}${endpoint}`, {
+        username,
+        password,
       });
-      setPrompts(response.data);
+      if (response.data.token) {
+        setToken(response.data.token);
+        localStorage.setItem("token", response.data.token);
+      }
     } catch (error) {
-      console.error("Error fetching prompts:", error);
+      console.error("Authentication error:", error);
     }
   };
-
-  const handleSubmit = async (promptData) => {
-    try {
-      const response = await axios.post(`${API_URL}/prompts`, promptData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPrompts([response.data, ...prompts]);
-    } catch (error) {
-      console.error("Error creating prompt:", error);
-    }
-  };
-
-  if (!token) {
-    return (
-      <Container maxWidth="sm">
-        <Auth setToken={setToken} />
-      </Container>
-    );
-  }
 
   return (
-    <div>
-      <Header />
-      <Container maxWidth="md">
-        <Typography variant="h4" component="h1" gutterBottom>
-          Prompt Refinement
-        </Typography>
-        <PromptForm onSubmit={handleSubmit} />
-        <Typography variant="h5" component="h2" gutterBottom>
-          Refined Prompts
-        </Typography>
-        <PromptList prompts={prompts} />
-      </Container>
-    </div>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+      <Typography variant="h5">{isLogin ? "Login" : "Register"}</Typography>
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        label="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+      />
+      <TextField
+        margin="normal"
+        required
+        fullWidth
+        label="Password"
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+      />
+      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        {isLogin ? "Login" : "Register"}
+      </Button>
+      <Button onClick={() => setIsLogin(!isLogin)}>
+        {isLogin
+          ? "Need an account? Register"
+          : "Already have an account? Login"}
+      </Button>
+    </Box>
   );
 };
 
-export default App;
+export default Auth;

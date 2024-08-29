@@ -1,8 +1,34 @@
 import React from "react";
-import { List, ListItem, ListItemText, Typography, Paper } from "@mui/material";
+import {
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+  Paper,
+  Rating,
+  Box,
+} from "@mui/material";
 import { motion } from "framer-motion";
+import axios from "axios";
 
-const PromptList = ({ prompts }) => {
+const API_URL = process.env.REACT_APP_API_URL;
+
+const PromptList = ({ prompts, token }) => {
+  const handleRating = async (promptId, newValue) => {
+    try {
+      await axios.post(
+        `${API_URL}/prompts/${promptId}/rate`,
+        { rating: newValue },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      // You might want to update the local state or refetch prompts here
+    } catch (error) {
+      console.error("Error rating prompt:", error);
+    }
+  };
+
   return (
     <List>
       {prompts.map((prompt, index) => (
@@ -41,6 +67,16 @@ const PromptList = ({ prompts }) => {
                 }
               />
             </ListItem>
+            <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
+              <Typography component="legend">Rate this prompt:</Typography>
+              <Rating
+                name={`rating-${prompt._id}`}
+                value={prompt.rating || 0}
+                onChange={(event, newValue) => {
+                  handleRating(prompt._id, newValue);
+                }}
+              />
+            </Box>
           </Paper>
         </motion.div>
       ))}

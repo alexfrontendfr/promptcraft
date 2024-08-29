@@ -3,11 +3,11 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Container, Typography, Box, Paper } from "@mui/material";
 import { motion } from "framer-motion";
+import axios from "axios";
 import Header from "./components/Header";
 import PromptForm from "./components/PromptForm";
 import PromptList from "./components/PromptList";
-import FeatureSection from "./components/FeatureSection";
-import PromptTypeInfo from "./components/PromptTypeInfo";
+import Auth from "./components/Auth";
 
 const theme = createTheme({
   typography: {
@@ -57,22 +57,66 @@ const theme = createTheme({
     },
   },
 });
+const API_URL = process.env.REACT_APP_API_URL;
 
 const App = () => {
   const [prompts, setPrompts] = useState([]);
+  const [latestRefinedPrompt, setLatestRefinedPrompt] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
   useEffect(() => {
-    // Fetch prompts logic here
-  }, []);
+    if (token) {
+      fetchPrompts();
+    }
+  }, [token]);
+
+  const fetchPrompts = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/prompts`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPrompts(response.data);
+    } catch (error) {
+      console.error("Error fetching prompts:", error);
+    }
+  };
 
   const handleSubmit = async (promptData) => {
-    // Submit prompt logic here
+    try {
+      const response = await axios.post(`${API_URL}/prompts`, promptData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPrompts([response.data, ...prompts]);
+      setLatestRefinedPrompt(response.data);
+    } catch (error) {
+      console.error("Error creating prompt:", error);
+    }
   };
+
+  if (!token) {
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container component="main" maxWidth="xs">
+          <Box
+            sx={{
+              marginTop: 8,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <Auth setToken={setToken} />
+          </Box>
+        </Container>
+      </ThemeProvider>
+    );
+  }
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header />
+      <Header setToken={setToken} />
       <Container maxWidth="lg">
         <Box my={8}>
           <motion.div
@@ -94,7 +138,16 @@ const App = () => {
           <PromptForm onSubmit={handleSubmit} />
         </Paper>
 
-        <FeatureSection />
+        {latestRefinedPrompt && (
+          <Paper elevation={3} sx={{ p: 4, mb: 8 }}>
+            <Typography variant="h6" gutterBottom>
+              Latest Refined Prompt:
+            </Typography>
+            <Typography variant="body1">
+              {latestRefinedPrompt.refinedPrompt}
+            </Typography>
+          </Paper>
+        )}
 
         <Box my={8}>
           <Typography variant="h2" align="center" gutterBottom>
@@ -102,8 +155,6 @@ const App = () => {
           </Typography>
           <PromptList prompts={prompts} />
         </Box>
-
-        <PromptTypeInfo />
       </Container>
     </ThemeProvider>
   );
