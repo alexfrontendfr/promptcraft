@@ -3,18 +3,28 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const connectDB = require("./db");
 const promptRoutes = require("./routes/prompts");
+const authRoutes = require("./routes/auth");
 const errorHandler = require("./middleware/errorHandler");
 
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+// CORS configuration
+app.use(
+  cors({
+    origin: "https://alexfrontendfr.github.io",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 
 connectDB();
 
 app.use("/api/prompts", promptRoutes);
+app.use("/api/auth", authRoutes);
 
 app.use(errorHandler);
 
