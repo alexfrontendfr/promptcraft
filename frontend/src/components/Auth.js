@@ -6,7 +6,6 @@ import {
   Box,
   Card,
   CardContent,
-  Snackbar,
   Alert,
 } from "@mui/material";
 import axios from "axios";
@@ -18,10 +17,12 @@ const Auth = ({ setToken }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     try {
       const endpoint = isLogin ? "/auth/login" : "/auth/register";
       const response = await axios.post(`${API_URL}${endpoint}`, {
@@ -31,8 +32,11 @@ const Auth = ({ setToken }) => {
       if (response.data.token) {
         setToken(response.data.token);
         localStorage.setItem("token", response.data.token);
-      } else {
-        setError(response.data.message || "Authentication successful");
+      } else if (!isLogin) {
+        setSuccess("Registration successful! Please log in.");
+        setIsLogin(true);
+        setUsername("");
+        setPassword("");
       }
     } catch (error) {
       setError(error.response?.data?.message || "An error occurred");
@@ -49,6 +53,16 @@ const Auth = ({ setToken }) => {
         <Typography variant="h5" align="center" gutterBottom>
           {isLogin ? "Login" : "Register"}
         </Typography>
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+        {success && (
+          <Alert severity="success" sx={{ mb: 2 }}>
+            {success}
+          </Alert>
+        )}
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
           <TextField
             margin="normal"
@@ -82,7 +96,11 @@ const Auth = ({ setToken }) => {
           <Button
             fullWidth
             variant="outlined"
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setError("");
+              setSuccess("");
+            }}
             sx={{ mb: 1 }}
           >
             {isLogin
@@ -99,19 +117,6 @@ const Auth = ({ setToken }) => {
           </Button>
         </Box>
       </CardContent>
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError("")}
-      >
-        <Alert
-          onClose={() => setError("")}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
-          {error}
-        </Alert>
-      </Snackbar>
     </Card>
   );
 };

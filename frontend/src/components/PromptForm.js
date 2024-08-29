@@ -7,7 +7,6 @@ import {
   FormControl,
   InputLabel,
   Box,
-  Snackbar,
   Alert,
 } from "@mui/material";
 import { motion } from "framer-motion";
@@ -40,7 +39,12 @@ const PromptForm = ({ onSubmit }) => {
     setIsLoading(true);
     setError(null);
 
-    // Perform client-side refinement
+    if (!originalPrompt || !technique) {
+      setError("Please fill in all fields");
+      setIsLoading(false);
+      return;
+    }
+
     const refinedPrompt = refinePromptLocally(originalPrompt, technique);
 
     try {
@@ -64,53 +68,47 @@ const PromptForm = ({ onSubmit }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <TextField
-        fullWidth
-        label="Your Prompt"
-        value={originalPrompt}
-        onChange={(e) => setOriginalPrompt(e.target.value)}
-        margin="normal"
-        variant="outlined"
-        sx={{ mb: 3 }}
-      />
-      <FormControl fullWidth margin="normal" sx={{ mb: 3 }}>
-        <InputLabel>Refinement Technique</InputLabel>
-        <Select
-          value={technique}
-          onChange={(e) => setTechnique(e.target.value)}
-        >
-          <MenuItem value="zero-shot">Zero-Shot</MenuItem>
-          <MenuItem value="few-shot">Few-Shot</MenuItem>
-          <MenuItem value="chain-of-thought">Chain-of-Thought</MenuItem>
-        </Select>
-      </FormControl>
-      <Box textAlign="center">
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Button
-            type="submit"
-            variant="contained"
-            size="large"
-            disabled={isLoading}
-          >
-            {isLoading ? "Refining..." : "Refine Prompt"}
-          </Button>
-        </motion.div>
-      </Box>
-      <Snackbar
-        open={!!error}
-        autoHideDuration={6000}
-        onClose={() => setError(null)}
-      >
-        <Alert
-          onClose={() => setError(null)}
-          severity="error"
-          sx={{ width: "100%" }}
-        >
+    <Box>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
           {error}
         </Alert>
-      </Snackbar>
-    </form>
+      )}
+      <form onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          label="Your Prompt"
+          value={originalPrompt}
+          onChange={(e) => setOriginalPrompt(e.target.value)}
+          margin="normal"
+          variant="outlined"
+          sx={{ mb: 3 }}
+        />
+        <FormControl fullWidth margin="normal" sx={{ mb: 3 }}>
+          <InputLabel>Refinement Technique</InputLabel>
+          <Select
+            value={technique}
+            onChange={(e) => setTechnique(e.target.value)}
+          >
+            <MenuItem value="zero-shot">Zero-Shot</MenuItem>
+            <MenuItem value="few-shot">Few-Shot</MenuItem>
+            <MenuItem value="chain-of-thought">Chain-of-Thought</MenuItem>
+          </Select>
+        </FormControl>
+        <Box textAlign="center">
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              size="large"
+              disabled={isLoading}
+            >
+              {isLoading ? "Refining..." : "Refine Prompt"}
+            </Button>
+          </motion.div>
+        </Box>
+      </form>
+    </Box>
   );
 };
 
