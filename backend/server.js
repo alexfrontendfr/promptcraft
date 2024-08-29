@@ -14,10 +14,13 @@ const app = express();
 app.use(
   cors({
     origin: "https://alexfrontendfr.github.io",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// Handle preflight requests
+app.options("*", cors());
 
 app.use(express.json());
 

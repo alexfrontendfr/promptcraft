@@ -2,7 +2,12 @@ import React from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { motion } from "framer-motion";
 
-const Header = () => {
+const Header = ({ setToken, isGuest }) => {
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+  };
+
   return (
     <AppBar position="static" color="transparent" elevation={0}>
       <Toolbar>
@@ -21,7 +26,15 @@ const Header = () => {
           </Box>
         </Typography>
         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-          <Button color="inherit">Login</Button>
+          {isGuest ? (
+            <Button color="inherit" onClick={() => setToken(null)}>
+              Login/Register
+            </Button>
+          ) : (
+            <Button color="inherit" onClick={handleLogout}>
+              Logout
+            </Button>
+          )}
         </motion.div>
       </Toolbar>
     </AppBar>

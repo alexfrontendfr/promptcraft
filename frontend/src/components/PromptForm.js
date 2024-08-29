@@ -15,6 +15,20 @@ import axios from "axios";
 
 const API_URL = process.env.REACT_APP_API_URL;
 
+// Client-side prompt refinement function
+const refinePromptLocally = (originalPrompt, technique) => {
+  switch (technique) {
+    case "zero-shot":
+      return `Answer the following directly: ${originalPrompt}`;
+    case "few-shot":
+      return `Consider these examples:\nExample 1: [Input] -> [Output]\nExample 2: [Input] -> [Output]\nNow answer: ${originalPrompt}`;
+    case "chain-of-thought":
+      return `Let's approach this step-by-step:\n1) Understand the question: ${originalPrompt}\n2) Break it down\n3) Analyze each part\n4) Synthesize and answer`;
+    default:
+      return originalPrompt;
+  }
+};
+
 const PromptForm = ({ onSubmit }) => {
   const [originalPrompt, setOriginalPrompt] = useState("");
   const [technique, setTechnique] = useState("");
@@ -25,9 +39,14 @@ const PromptForm = ({ onSubmit }) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+
+    // Perform client-side refinement
+    const refinedPrompt = refinePromptLocally(originalPrompt, technique);
+
     try {
       const response = await axios.post(`${API_URL}/prompts`, {
         originalPrompt,
+        refinedPrompt,
         technique,
       });
       onSubmit(response.data);

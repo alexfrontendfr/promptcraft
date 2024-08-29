@@ -73,7 +73,7 @@ const App = () => {
   const fetchPrompts = async () => {
     try {
       const response = await axios.get(`${API_URL}/prompts`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token !== "guest" ? { Authorization: `Bearer ${token}` } : {},
       });
       setPrompts(response.data);
     } catch (error) {
@@ -84,7 +84,7 @@ const App = () => {
   const handleSubmit = async (promptData) => {
     try {
       const response = await axios.post(`${API_URL}/prompts`, promptData, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: token !== "guest" ? { Authorization: `Bearer ${token}` } : {},
       });
       setPrompts([response.data, ...prompts]);
       setLatestRefinedPrompt(response.data);
@@ -97,17 +97,8 @@ const App = () => {
     return (
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Container component="main" maxWidth="xs">
-          <Box
-            sx={{
-              marginTop: 8,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
-            <Auth setToken={setToken} />
-          </Box>
+        <Container component="main" maxWidth="sm">
+          <Auth setToken={setToken} />
         </Container>
       </ThemeProvider>
     );
@@ -116,7 +107,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header setToken={setToken} />
+      <Header setToken={setToken} isGuest={token === "guest"} />
       <Container maxWidth="lg">
         <Box my={8}>
           <motion.div
