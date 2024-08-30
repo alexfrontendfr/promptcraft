@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Container, Typography, Box, Paper } from "@mui/material";
@@ -61,16 +61,9 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 const App = () => {
   const [prompts, setPrompts] = useState([]);
-  const [latestRefinedPrompt, setLatestRefinedPrompt] = useState(null);
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  useEffect(() => {
-    if (token) {
-      fetchPrompts(token);
-    }
-  }, [token]);
-
-  const fetchPrompts = async () => {
+  const fetchPrompts = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/prompts`, {
         headers: token !== "guest" ? { Authorization: `Bearer ${token}` } : {},
@@ -79,7 +72,13 @@ const App = () => {
     } catch (error) {
       console.error("Error fetching prompts:", error);
     }
-  };
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchPrompts();
+    }
+  }, [token, fetchPrompts]);
 
   const handleSubmit = async (promptData) => {
     try {
@@ -87,7 +86,6 @@ const App = () => {
         headers: token !== "guest" ? { Authorization: `Bearer ${token}` } : {},
       });
       setPrompts([response.data, ...prompts]);
-      setLatestRefinedPrompt(response.data);
     } catch (error) {
       console.error("Error creating prompt:", error);
     }
@@ -107,38 +105,21 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Header setToken={setToken} isGuest={token === "guest"} />
+      <Header setToken={setToken} />
       <Container maxWidth="lg">
         <Box my={8}>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <Typography variant="h1" align="center" gutterBottom>
-              Craft Your Perfect Prompt
-            </Typography>
-            <Typography variant="body1" align="center" paragraph>
-              Elevate your AI interactions with PromptCraft – Where Precision
-              Meets Creativity
-            </Typography>
-          </motion.div>
+          <Typography variant="h1" align="center" gutterBottom>
+            Craft Your Perfect Prompt
+          </Typography>
+          <Typography variant="body1" align="center" paragraph>
+            Elevate your AI interactions with PromptCraft – Where Precision
+            Meets Creativity
+          </Typography>
         </Box>
 
         <Paper elevation={3} sx={{ p: 4, mb: 8 }}>
           <PromptForm onSubmit={handleSubmit} />
         </Paper>
-
-        {latestRefinedPrompt && (
-          <Paper elevation={3} sx={{ p: 4, mb: 8 }}>
-            <Typography variant="h6" gutterBottom>
-              Latest Refined Prompt:
-            </Typography>
-            <Typography variant="body1">
-              {latestRefinedPrompt.refinedPrompt}
-            </Typography>
-          </Paper>
-        )}
 
         <Box my={8}>
           <Typography variant="h2" align="center" gutterBottom>

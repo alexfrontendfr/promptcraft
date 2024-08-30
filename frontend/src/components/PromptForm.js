@@ -8,12 +8,11 @@ import {
   InputLabel,
   Box,
   Alert,
+  CircularProgress,
+  Snackbar,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { refinePromptWithAI } from "../services/aiPromptService";
-
-const API_URL = process.env.REACT_APP_API_URL;
 
 const PromptForm = ({ onSubmit }) => {
   const [originalPrompt, setOriginalPrompt] = useState("");
@@ -22,6 +21,7 @@ const PromptForm = ({ onSubmit }) => {
   const [tone, setTone] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,31 +29,20 @@ const PromptForm = ({ onSubmit }) => {
     setError(null);
 
     try {
-      let refinedPrompt;
-      if (technique === "ai-powered") {
-        refinedPrompt = await refinePromptWithAI(originalPrompt, context, tone);
-      } else {
-        // Use your existing refinement logic here
-        refinedPrompt = originalPrompt; // Placeholder
-      }
-
-      const response = await axios.post(`${API_URL}/prompts`, {
+      const refinedPrompt = await refinePromptWithAI(
         originalPrompt,
-        refinedPrompt,
-        technique,
-        tone,
         context,
-      });
-      onSubmit(response.data);
+        tone,
+        technique
+      );
+      onSubmit({ originalPrompt, refinedPrompt, technique, tone, context });
+      setSuccess(true);
       setOriginalPrompt("");
       setContext("");
       setTechnique("");
       setTone("");
     } catch (error) {
-      setError(
-        error.response?.data?.message ||
-          "An error occurred while refining the prompt"
-      );
+      setError(error.message || "An error occurred while refining the prompt");
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +59,7 @@ const PromptForm = ({ onSubmit }) => {
         onChange={(e) => setOriginalPrompt(e.target.value)}
         margin="normal"
         variant="outlined"
+        required
       />
       <TextField
         fullWidth
@@ -81,7 +71,7 @@ const PromptForm = ({ onSubmit }) => {
         margin="normal"
         variant="outlined"
       />
-      <FormControl fullWidth margin="normal">
+      <FormControl fullWidth margin="normal" required>
         <InputLabel>Refinement Technique</InputLabel>
         <Select
           value={technique}
@@ -93,7 +83,7 @@ const PromptForm = ({ onSubmit }) => {
           <MenuItem value="ai-powered">AI-Powered</MenuItem>
         </Select>
       </FormControl>
-      <FormControl fullWidth margin="normal">
+      <FormControl fullWidth margin="normal" required>
         <InputLabel>Tone</InputLabel>
         <Select value={tone} onChange={(e) => setTone(e.target.value)}>
           <MenuItem value="formal">Formal</MenuItem>
@@ -109,16 +99,38 @@ const PromptForm = ({ onSubmit }) => {
             variant="contained"
             size="large"
             disabled={isLoading}
+            startIcon={isLoading ? <CircularProgress size={20} /> : null}
           >
             {isLoading ? "Refining..." : "Refine Prompt"}
           </Button>
         </motion.div>
       </Box>
-      {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
+      <Snackbar
+        open={error !== null}
+        autoHideDuration={6000}
+        onClose={() => setError(null)}
+      >
+        <Alert
+          onClose={() => setError(null)}
+          severity="error"
+          sx={{ width: "100%" }}
+        >
           {error}
         </Alert>
-      )}
+      </Snackbar>
+      <Snackbar
+        open={success}
+        autoHideDuration={3000}
+        onClose={() => setSuccess(false)}
+      >
+        <Alert
+          onClose={() => setSuccess(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Prompt refined successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
