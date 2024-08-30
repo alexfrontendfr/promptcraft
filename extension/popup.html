@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PromptCraft</title>
+    <style>
+      body {
+        width: 300px;
+        padding: 10px;
+        font-family: Arial, sans-serif;
+      }
+      textarea {
+        width: 100%;
+        height: 100px;
+        margin-bottom: 10px;
+      }
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      #result {
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="prompt" placeholder="Enter your prompt"></textarea>
+    <button id="refine">Refine Prompt</button>
+    <div id="result"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>

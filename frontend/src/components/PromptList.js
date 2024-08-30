@@ -5,28 +5,17 @@ import {
   ListItemText,
   Typography,
   Paper,
-  Rating,
+  Chip,
   Box,
+  IconButton,
 } from "@mui/material";
 import { motion } from "framer-motion";
-import axios from "axios";
+import { ThumbUp, ThumbDown, ContentCopy } from "@mui/icons-material";
 
-const API_URL = process.env.REACT_APP_API_URL;
-
-const PromptList = ({ prompts, token }) => {
-  const handleRating = async (promptId, newValue) => {
-    try {
-      await axios.post(
-        `${API_URL}/prompts/${promptId}/rate`,
-        { rating: newValue },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      // You might want to update the local state or refetch prompts here
-    } catch (error) {
-      console.error("Error rating prompt:", error);
-    }
+const PromptList = ({ prompts }) => {
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    // You could add a snackbar notification here
   };
 
   return (
@@ -38,45 +27,60 @@ const PromptList = ({ prompts, token }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
         >
-          <Paper elevation={2} sx={{ mb: 3, p: 3 }}>
-            <ListItem>
+          <Paper elevation={3} sx={{ mb: 3, p: 3, borderRadius: 2 }}>
+            <ListItem alignItems="flex-start">
               <ListItemText
                 primary={
                   <Typography variant="h6" gutterBottom>
-                    {prompt.refinedPrompt}
+                    Refined Prompt:
                   </Typography>
                 }
                 secondary={
                   <>
                     <Typography
                       component="span"
-                      variant="body2"
+                      variant="body1"
                       color="text.primary"
+                      sx={{ display: "inline", mb: 2 }}
                     >
-                      Original: {prompt.originalPrompt}
+                      {prompt.refinedPrompt}
                     </Typography>
-                    <br />
-                    <Typography
-                      component="span"
-                      variant="body2"
-                      color="text.secondary"
+                    <Box mt={2}>
+                      <Typography variant="body2" color="text.secondary">
+                        Original: {prompt.originalPrompt}
+                      </Typography>
+                    </Box>
+                    <Box
+                      mt={2}
+                      display="flex"
+                      justifyContent="space-between"
+                      alignItems="center"
                     >
-                      Technique: {prompt.technique}
-                    </Typography>
+                      <Box>
+                        <Chip
+                          label={`Technique: ${prompt.technique}`}
+                          sx={{ mr: 1 }}
+                        />
+                        <Chip label={`Tone: ${prompt.tone}`} />
+                      </Box>
+                      <Box>
+                        <IconButton
+                          onClick={() => handleCopy(prompt.refinedPrompt)}
+                        >
+                          <ContentCopy />
+                        </IconButton>
+                        <IconButton>
+                          <ThumbUp />
+                        </IconButton>
+                        <IconButton>
+                          <ThumbDown />
+                        </IconButton>
+                      </Box>
+                    </Box>
                   </>
                 }
               />
             </ListItem>
-            <Box sx={{ display: "flex", alignItems: "center", mt: 2 }}>
-              <Typography component="legend">Rate this prompt:</Typography>
-              <Rating
-                name={`rating-${prompt._id}`}
-                value={prompt.rating || 0}
-                onChange={(event, newValue) => {
-                  handleRating(prompt._id, newValue);
-                }}
-              />
-            </Box>
           </Paper>
         </motion.div>
       ))}

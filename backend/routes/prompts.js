@@ -7,6 +7,14 @@ router.post("/", async (req, res) => {
   try {
     const { originalPrompt, refinedPrompt, technique } = req.body;
 
+    // Check for existing prompt with same original content and technique
+    const existingPrompt = await Prompt.findOne({ originalPrompt, technique });
+    if (existingPrompt) {
+      return res
+        .status(400)
+        .json({ message: "A similar prompt already exists" });
+    }
+
     const prompt = new Prompt({
       originalPrompt,
       refinedPrompt,

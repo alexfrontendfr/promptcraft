@@ -66,7 +66,7 @@ const App = () => {
 
   useEffect(() => {
     if (token) {
-      fetchPrompts();
+      fetchPrompts(token);
     }
   }, [token]);
 
