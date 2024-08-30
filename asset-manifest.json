@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/promptcraft/static/js/main.b93723df.js",
+    "main.js": "/promptcraft/static/js/main.362d40cd.js",
     "index.html": "/promptcraft/index.html",
-    "main.b93723df.js.map": "/promptcraft/static/js/main.b93723df.js.map"
+    "main.362d40cd.js.map": "/promptcraft/static/js/main.362d40cd.js.map"
   },
   "entrypoints": [
-    "static/js/main.b93723df.js"
+    "static/js/main.362d40cd.js"
   ]
 }
