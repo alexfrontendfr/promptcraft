@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/material/styles";
 import {
   CssBaseline,
   Container,
@@ -11,28 +11,8 @@ import {
 import { motion } from "framer-motion";
 import PromptForm from "./components/PromptForm";
 import PromptHistory from "./components/PromptHistory";
-
-const theme = createTheme({
-  typography: {
-    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontSize: "3rem",
-      fontWeight: 700,
-    },
-    h6: {
-      fontSize: "1.25rem",
-      fontWeight: 600,
-    },
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-  },
-});
+import PromptTypeInfo from "./components/PromptTypeInfo";
+import theme from "./theme";
 
 const App = () => {
   const [history, setHistory] = useState([]);
@@ -66,9 +46,9 @@ const App = () => {
         </Box>
         <PromptForm onSubmit={console.log} addToHistory={addToHistory} />
         <PromptHistory history={history} />
+        <PromptTypeInfo />
       </Container>
     </ThemeProvider>
   );
 };
-
 export default App;

@@ -22,6 +22,7 @@ app.use("/api/prompts", promptRoutes);
 app.use("/api/auth", authRoutes);
 
 // Palm2 setup
+
 const MODEL_NAME = "models/chat-bison-001";
 const API_KEY = process.env.PALM2_API_KEY;
 
@@ -66,7 +67,9 @@ app.post("/api/refine-prompt", async (req, res) => {
     }
   } catch (error) {
     console.error("Error refining prompt:", error);
-    res.status(500).json({ error: "Error refining prompt" });
+    res
+      .status(500)
+      .json({ error: "Error refining prompt", details: error.message });
   }
 });
 

@@ -27,7 +27,7 @@ const PromptList = ({ prompts }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: index * 0.1 }}
         >
-          <Paper elevation={3} sx={{ mb: 3, p: 3, borderRadius: 2 }}>
+          <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
             <ListItem alignItems="flex-start">
               <ListItemText
                 primary={
