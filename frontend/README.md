@@ -21,7 +21,7 @@ PromptCraft is an AI-powered tool that helps users refine and improve their prom
 1. Clone the repository:
 
    ```
-   git clone https://github.com/yourusername/promptcraft.git
+   git clone https://github.com/alexfrontendfr/promptcraft.git
    ```
 
 2. Navigate to the project directory:
