@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const HUGGING_FACE_API_URL =
-  "https://api-inference.huggingface.co/models/facebook/bart-large-mnli";
+  "https://api-inference.huggingface.co/models/EleutherAI/gpt-neo-1.3B";
 const HUGGING_FACE_API_KEY = process.env.REACT_APP_HUGGING_FACE_API_KEY;
 
 export const refinePromptWithAI = async (prompt, context, tone, technique) => {

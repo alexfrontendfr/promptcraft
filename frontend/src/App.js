@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Container, Typography, Box, Paper } from "@mui/material";
-import { motion } from "framer-motion";
 import axios from "axios";
 import Header from "./components/Header";
 import PromptForm from "./components/PromptForm";
@@ -103,32 +102,36 @@ const App = () => {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Header setToken={setToken} />
-      <Container maxWidth="lg">
-        <Box my={8}>
-          <Typography variant="h1" align="center" gutterBottom>
-            Craft Your Perfect Prompt
-          </Typography>
-          <Typography variant="body1" align="center" paragraph>
-            Elevate your AI interactions with PromptCraft – Where Precision
-            Meets Creativity
-          </Typography>
-        </Box>
+    <Container maxWidth="lg">
+      <Box my={4}>
+        <Typography variant="h2" align="center" gutterBottom>
+          PromptCraft
+        </Typography>
+        <Typography variant="h5" align="center" paragraph>
+          Refine your prompts with AI assistance
+        </Typography>
+      </Box>
 
-        <Paper elevation={3} sx={{ p: 4, mb: 8 }}>
-          <PromptForm onSubmit={handleSubmit} />
-        </Paper>
+      <Paper elevation={3} sx={{ p: 4, mb: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          How to use PromptCraft:
+        </Typography>
+        <ol>
+          <li>Enter your original prompt in the text field</li>
+          <li>Provide context to help the AI understand your needs</li>
+          <li>Select the desired tone for the refined prompt</li>
+          <li>Choose a refinement technique</li>
+          <li>Click "Refine Prompt" to generate an improved version</li>
+        </ol>
+        <Typography variant="body1" paragraph>
+          PromptCraft uses advanced AI to enhance your prompts, making them more
+          effective and tailored to your needs.
+        </Typography>
+      </Paper>
 
-        <Box my={8}>
-          <Typography variant="h2" align="center" gutterBottom>
-            Refined Prompts
-          </Typography>
-          <PromptList prompts={prompts} />
-        </Box>
-      </Container>
-    </ThemeProvider>
+      <PromptForm onSubmit={handleSubmit} />
+      <PromptList prompts={prompts} />
+    </Container>
   );
 };
 
